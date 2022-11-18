@@ -130,7 +130,7 @@ namespace OutputLibrary
             return res;
         }
 
-        private async Task CreateHTMLOut(string html) => await File.WriteAllTextAsync("D:\\Projects\\DirScanner\\ResLibrary\\" + "out.html", html);
+        private async Task CreateHTMLOut(string html) => await File.WriteAllTextAsync(Directory.GetCurrentDirectory() + "\\out.html", html);
 
     }
 }
