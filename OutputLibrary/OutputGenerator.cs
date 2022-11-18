@@ -6,49 +6,26 @@ namespace OutputLibrary
 {
     public class OutputGenerator : IOutputGenerator
     {
-        //private readonly string _MIMETypesListTemlatePath = Directory.GetCurrentDirectory() + "\\ResLibrary\\MIMETypesListTemlate.html";
-        //private readonly string _outTemplate = Directory.GetCurrentDirectory() + "\\ResLibrary\\OutTemplate.html";
-        //private readonly string _fileStatsTemplatePath = Directory.GetCurrentDirectory() + "\\ResLibrary\\FileStatsTemplate.html";
-        //private readonly string _dirStatsTemplatePath = Directory.GetCurrentDirectory() + "\\ResLibrary\\DirStatsTemplate.html";
-
-
-        private readonly string _MIMETypesListTemlatePath = ResLibrary.Properties.Resources.MIMETypesListTemlate;
+        private readonly string _MIMETypesListTemlate = ResLibrary.Properties.Resources.MIMETypesListTemlate;
         private readonly string _outTemplate = ResLibrary.Properties.Resources.OutTemplate;
-        private readonly string _fileStatsTemplatePath = ResLibrary.Properties.Resources.FileStatsTemplate;
-        private readonly string _dirStatsTemplatePath = ResLibrary.Properties.Resources.DirStatsTemplate;
+        private readonly string _fileStatsTemplate = ResLibrary.Properties.Resources.FileStatsTemplate;
+        private readonly string _dirStatsTemplate = ResLibrary.Properties.Resources.DirStatsTemplate;
 
         public async Task GenerateHtmlAsync(List<ScanStats> scanStats, List<DirInfo> dirInfos, List<FileInfo> fileInfos)
         {
-            string html;
-            try
-            {
-                html = await File.ReadAllTextAsync(_outTemplate);
-            }
-            catch
-            {
-                Console.WriteLine("No OutTemplate.html template");
+            if (_MIMETypesListTemlate == null || _outTemplate == null || _fileStatsTemplate == null || _dirStatsTemplate == null)
                 return;
-            }
+
+            var html = _outTemplate;
 
             StringBuilder typeListStats;
             if (scanStats != null)
             {
-                try
-                {
-                    typeListStats = await GenerateMIMEStatList(scanStats);
 
-                    html = ReplaceGeneratedList(html, typeListStats.ToString(), "{{TypeList}}");
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine("No MIMETypesListTemlate.html template");
-                    return;
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    Console.WriteLine("No resourses");
-                    return;
-                }
+                typeListStats = await GenerateMIMEStatList(scanStats);
+
+                html = ReplaceGeneratedList(html, typeListStats.ToString(), "{{TypeList}}");
+
             }
             else
             {
@@ -58,22 +35,11 @@ namespace OutputLibrary
             StringBuilder dirListStats;
             if (dirInfos != null)
             {
-                try
-                {
-                    dirListStats = await GenerateDirsStatList(dirInfos);
 
-                    html = ReplaceGeneratedList(html, dirListStats.ToString(), "{{DirsList}}");
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine("No DirStatsTemplate.html template");
-                    return;
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    Console.WriteLine("No resourses");
-                    return;
-                }
+                dirListStats = await GenerateDirsStatList(dirInfos);
+
+                html = ReplaceGeneratedList(html, dirListStats.ToString(), "{{DirsList}}");
+
 
             }
             else
@@ -84,22 +50,10 @@ namespace OutputLibrary
             StringBuilder fileListStats;
             if (fileInfos != null)
             {
-                try
-                {
-                    fileListStats = await GenerateFilesStatList(fileInfos);
 
-                    html = ReplaceGeneratedList(html, fileListStats.ToString(), "{{FilesList}}");
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine("No FileStatsTemplate.html template");
-                    return;
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    Console.WriteLine("No resourses");
-                    return;
-                }
+                fileListStats = await GenerateFilesStatList(fileInfos);
+
+                html = ReplaceGeneratedList(html, fileListStats.ToString(), "{{FilesList}}");
             }
             else
             {
@@ -114,7 +68,7 @@ namespace OutputLibrary
             if (scanStats.Count == 0)
                 return new StringBuilder("No elements");
 
-            var html = await File.ReadAllTextAsync(_MIMETypesListTemlatePath);
+            var html = _MIMETypesListTemlate;
 
 
             var res = new StringBuilder();
@@ -136,7 +90,7 @@ namespace OutputLibrary
             if (scanStats.Count == 0)
                 return new StringBuilder("No elements");
 
-            var html = await File.ReadAllTextAsync(_dirStatsTemplatePath);
+            var html = _dirStatsTemplate;
 
             var res = new StringBuilder();
             foreach (var stat in scanStats)
@@ -155,7 +109,7 @@ namespace OutputLibrary
             if (scanStats.Count == 0)
                 return new StringBuilder("No elements");
 
-            var html = await File.ReadAllTextAsync(_fileStatsTemplatePath);
+            var html = _fileStatsTemplate;
 
             var res = new StringBuilder();
             foreach (var stat in scanStats)
